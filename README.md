@@ -1,61 +1,116 @@
-# TWRP Device Tree for Samsung Galaxy devices with Exynos 2200 (s5e9925/universal9925)
+# OrangeFox Recovery — Samsung Galaxy S22 series (Exynos 2200)
 
-## Device specifications
+Unofficial **OrangeFox R12.0** recovery for the Samsung Galaxy S22 family with Exynos 2200 (SoC codename `s5e9925`).
 
-| Branding Name                                | Model Number          | Internal Codename    |
-| :------------------------------------------- | :-------------------- | :------------------- |
-| Samsung Galaxy S22 (International)           | SM-S901B              |         r0s          |
-| Samsung Galaxy S22+ (International)          | SM-S906B              |         g0s          |
-| Samsung Galaxy S22 Ultra (International)     | SM-S908B              |         b0s          |
+Forked from [milxnaq/android_device_samsung_s5e9925](https://github.com/milxnaq/android_device_samsung_s5e9925) (TWRP base) with changes that make it usable day-to-day under OrangeFox: per-codename module loading, baked-in defaults, and **persistent settings on `/cache`** (workaround for Samsung's undecryptable `/data`).
 
+| Model | Codename | Lunch target | Tested |
+|---|---|---|---|
+| Galaxy S22 | `r0s` (SM-S901B) | `twrp_r0s-eng` | builds only |
+| Galaxy S22+ | `g0s` (SM-S906B) | `twrp_g0s-eng` | **daily-driven** |
+| Galaxy S22 Ultra | `b0s` (SM-S908B) | `twrp_b0s-eng` | builds only |
 
-## Kernel source 
+## ✅ What works
 
-Available at [https://github.com/ExtremeXT/android_kernel_samsung_s5e9925](https://github.com/ExtremeXT/android_kernel_samsung_s5e9925)
+- Boot, touch, display (FHD+ 120 Hz on r0s/g0s; QHD+ on b0s)
+- ADB sideload, MTP, file browser
+- Flash custom ROMs / Magisk / KernelSU zips
+- Wipe / Format Data
+- Backup / Restore (to `/cache` thanks to `FOX_MISCELLANEOUS_ROOT_DIRECTORY`)
+- Mount of system / vendor / vendor_dlkm / product / odm (dynamic partitions)
+- **Persistent settings across reboots** — themes, brightness, language, custom configs all stick
 
-* Note: The kernel has been compiled with the --recovery flag set to y.
+## ⚠️ Known issues
 
-## Bugs
+| Issue | Status |
+|---|---|
+| `/data` decryption | **Not fixable in custom recovery.** Samsung's FBE + metadata encryption uses keys from Knox Vault / TEE that custom recovery can't access. Userdata appears as raw blocks. Workaround: format data, or use ADB from booted Android for file transfer. |
+| Flashlight | Disabled. S22 routes torch via `/sys/devices/virtual/camera/flash/rear_flash`, which doesn't fit OFRP's `OF_FL_PATH` convention (OFRP appends `/brightness` to the path). Needs a C++ patch to OFRP to support custom suffixes. |
+| Haptic feedback | Not implemented in the device tree (inherited from upstream). |
 
-- /data decryption
-- haptics
+## 🎨 Baked-in defaults
 
-## How to build
+OFRP boots with these out-of-the-box (and they stick across reboots via `/cache`):
 
-This device tree was tested and is fully compatible with [minimal-manifest-twrp](https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp).
+- Theme: **Cream** (warm brand-style)
+- Brightness: **30 %** (153 / 510)
+- Status-bar clock: **centered**
+- Hidden files: **visible**
+- Gesture navigation: **off**
+- Force fast charging: **on**
 
-1. Set up the build environment following the instructions [here](https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp/blob/twrp-12.1/README.md#getting-started)
+You can change any of them in OFRP Settings → Customization. Changes persist.
 
-2. In the root folder of the fetched repo, clone the device tree:
+## 📥 Install (Odin, Windows)
+
+> **You must have an unlocked bootloader** (OEM unlocking → Vol Up at the "Custom OS" warning screen). Knox is permanently tripped after this; Samsung Pay/Wallet and some banking apps may stop working.
+
+1. Download `OrangeFox-R12.0-Unofficial-<codename>.img` from the [Releases](../../releases) tab matching your phone (`r0s` = S22, `g0s` = S22+, `b0s` = S22 Ultra).
+2. Boot phone to Download Mode: power off → hold **Vol Down + Vol Up + USB**.
+3. Open Odin (PC). AP slot → select the `.img`. Leave other slots empty. Start.
+4. When Odin finishes (PASS!), unplug USB and **immediately** boot to recovery — hold **Power + Vol Up** until OrangeFox shows up. **Do not let it boot to Android first**, the stock kernel will overwrite the recovery partition with stock recovery on first boot.
+5. (Recommended) In OFRP: **Mount → Cache** once to confirm `/cache` is writable. Your settings will live there.
+
+## 🛠️ Build from source
+
+Tested on Ubuntu 22.04 in WSL2 with 12 cores / 12 GB RAM. Needs ~150 GB free disk.
 
 ```bash
-git clone https://github.com/dupazlasu/android_device_samsung_s5e9925 -b android-12.1 device/samsung/s5e9925
-```
+# 1) Build deps
+sudo apt install -y bc bison build-essential ccache curl flex g++-multilib \
+  gcc-multilib git git-lfs gnupg gperf imagemagick lib32readline-dev lib32z1-dev \
+  libelf-dev liblz4-tool libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop \
+  pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev fontconfig \
+  openjdk-11-jdk python-is-python3 python3 python3-pip aria2 unzip xz-utils
 
-3. To build:
+# 2) repo tool
+sudo curl -L https://storage.googleapis.com/git-repo-downloads/repo \
+  -o /usr/local/bin/repo && sudo chmod a+x /usr/local/bin/repo
 
-```bash
-. build/envsetup.sh
-lunch twrp_b0s-eng
+# 3) OFRP source sync (~80 GB)
+mkdir ~/src && cd ~/src
+git clone https://gitlab.com/OrangeFox/sync.git
+cd sync
+./orangefox_sync.sh --branch 12.1 --path ~/fox_12.1
+
+# 4) This device tree
+git clone https://github.com/TomekczPL/android_device_samsung_s5e9925_ofox \
+  ~/fox_12.1/device/twrp/s5e9925 -b android-12.1
+
+# 5) Apply the OFRP defaults patch
+cd ~/fox_12.1/bootable/recovery
+git apply ~/fox_12.1/device/twrp/s5e9925/patches/0001-ofrp-baked-defaults.patch
+
+# 6) Build (pick your codename)
+cd ~/fox_12.1
+source build/envsetup.sh
+export ALLOW_MISSING_DEPENDENCIES=true LC_ALL=C
+export FOX_BUILD_DEVICE=g0s         # or r0s / b0s
+lunch twrp_g0s-eng
 mka recoveryimage
 ```
 
-## Copyright
+Result: `out/target/product/<codename>/OrangeFox-R12.0-Unofficial-<codename>.img`
 
-```
-#
-# Copyright (C) 2024 The TWRP Open Source Project
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-```
+First build is ~13 minutes on 12 cores; subsequent codenames hit warm soong cache (~3 min).
+
+## 🧱 What changed vs. upstream `milxnaq/android_device_samsung_s5e9925`
+
+| Commit | Why |
+|---|---|
+| `device: copy per-codename recovery/root into ramdisk` | Upstream only copied common ramdisk content; per-codename kernel modules under `<cn>/recovery/root/lib/modules` were never bundled. Touch/UFS/panel drivers loaded as a result. |
+| `device: configure OrangeFox flashlight LED paths` | Samsung uses `torch-sec1` / `leds-sec1` naming, not the LED paths OFRP probes by default. Also drops brightness from 50 % → 30 %. |
+| `fstab: add /cache mount` | `/cache` is ext4 read-write and almost unused on modern Samsungs. We need a writable, unencrypted partition for OFRP storage. |
+| `vendorsetup: FOX_SETTINGS_ROOT_DIRECTORY=/cache/OFRP` | Without this, OFRP tries to write settings/backups to `/data/media/`, which is encrypted on S22 — every boot would lose configuration. Redirecting to `/cache` makes the build usable. |
+| `patches/0001-ofrp-baked-defaults.patch` | Applies sensible defaults (Cream theme, fast charge on, etc.) to OFRP's `data.cpp`. |
+
+## 🙏 Credits
+
+- **[milxnaq](https://github.com/milxnaq)** — upstream TWRP device tree, kernel prebuilts, sepolicy, all the heavy lifting.
+- **[OrangeFox team](https://gitlab.com/OrangeFox)** — recovery, vendor tree, build system.
+- **[TWRP team](https://twrp.me)** — base recovery & minimal manifest.
+- **Samsung S22 Exynos community** — bootloader unlock, fstab dumps, kernel module lists, testing.
+
+## License
+
+Apache License 2.0 — same as upstream.
