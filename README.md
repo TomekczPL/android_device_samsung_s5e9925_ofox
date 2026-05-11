@@ -6,13 +6,13 @@ Forked from [milxnaq/android_device_samsung_s5e9925](https://github.com/milxnaq/
 
 | Model | Codename | Lunch target | Tested |
 |---|---|---|---|
-| Galaxy S22 | `r0s` (SM-S901B) | `twrp_r0s-eng` | builds only |
-| Galaxy S22+ | `g0s` (SM-S906B) | `twrp_g0s-eng` | **daily-driven** |
-| Galaxy S22 Ultra | `b0s` (SM-S908B) | `twrp_b0s-eng` | builds only |
+| Galaxy S22 | `r0s` (SM-S901B) | `twrp_r0s-eng`
+| Galaxy S22+ | `g0s` (SM-S906B) | `twrp_g0s-eng`
+| Galaxy S22 Ultra | `b0s` (SM-S908B) | `twrp_b0s-eng`
 
 ## ✅ What works
 
-- Boot, touch, display (FHD+ 120 Hz on r0s/g0s; QHD+ on b0s)
+- Boot, touch, display
 - ADB sideload, MTP, file browser
 - Flash custom ROMs / Magisk / KernelSU zips
 - Wipe / Format Data
@@ -41,15 +41,6 @@ OFRP boots with these out-of-the-box (and they stick across reboots via `/cache`
 
 You can change any of them in OFRP Settings → Customization. Changes persist.
 
-## 📥 Install (Odin, Windows)
-
-> **You must have an unlocked bootloader** (OEM unlocking → Vol Up at the "Custom OS" warning screen). Knox is permanently tripped after this; Samsung Pay/Wallet and some banking apps may stop working.
-
-1. Download `OrangeFox-R12.0-Unofficial-<codename>.img` from the [Releases](../../releases) tab matching your phone (`r0s` = S22, `g0s` = S22+, `b0s` = S22 Ultra).
-2. Boot phone to Download Mode: power off → hold **Vol Down + Vol Up + USB**.
-3. Open Odin (PC). AP slot → select the `.img`. Leave other slots empty. Start.
-4. When Odin finishes (PASS!), unplug USB and **immediately** boot to recovery — hold **Power + Vol Up** until OrangeFox shows up. **Do not let it boot to Android first**, the stock kernel will overwrite the recovery partition with stock recovery on first boot.
-5. (Recommended) In OFRP: **Mount → Cache** once to confirm `/cache` is writable. Your settings will live there.
 
 ## 🛠️ Build from source
 
@@ -92,7 +83,6 @@ mka recoveryimage
 
 Result: `out/target/product/<codename>/OrangeFox-R12.0-Unofficial-<codename>.img`
 
-First build is ~13 minutes on 12 cores; subsequent codenames hit warm soong cache (~3 min).
 
 ## 🧱 What changed vs. upstream `milxnaq/android_device_samsung_s5e9925`
 
@@ -109,8 +99,7 @@ First build is ~13 minutes on 12 cores; subsequent codenames hit warm soong cach
 - **[milxnaq](https://github.com/milxnaq)** — upstream TWRP device tree, kernel prebuilts, sepolicy, all the heavy lifting.
 - **[OrangeFox team](https://gitlab.com/OrangeFox)** — recovery, vendor tree, build system.
 - **[TWRP team](https://twrp.me)** — base recovery & minimal manifest.
-- **Samsung S22 Exynos community** — bootloader unlock, fstab dumps, kernel module lists, testing.
 
 ## License
 
-Apache License 2.0 — same as upstream.
+Apache License 2.0
