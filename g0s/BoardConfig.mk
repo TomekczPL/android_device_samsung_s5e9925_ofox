@@ -23,6 +23,10 @@ $(foreach p, $(BOARD_PARTITION_LIST), $(eval TARGET_COPY_OUT_$(p) := $(call to-l
 
 # Display
 TW_MAX_BRIGHTNESS := 510
-TW_DEFAULT_BRIGHTNESS := 255
+TW_DEFAULT_BRIGHTNESS := 153
 
 include $(DEVICE_PATH)/BoardConfig.mk
+# OrangeFox flashlight (Samsung Exynos LED naming)
+OF_FLASHLIGHT_ENABLE := 1
+OF_FL_PATH1 := /sys/class/leds/torch-sec1
+OF_FL_PATH2 := /sys/class/leds/leds-sec1
