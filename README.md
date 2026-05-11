@@ -4,7 +4,7 @@ Unofficial **OrangeFox R12.0** recovery for the Samsung Galaxy S22 family with E
 
 
 | Model | Codename | Lunch target | Tested |
-|---|---|---|
+|---|---|---|---|
 | Galaxy S22 | `r0s` (SM-S901B) | `twrp_r0s-eng`
 | Galaxy S22+ | `g0s` (SM-S906B) | `twrp_g0s-eng`
 | Galaxy S22 Ultra | `b0s` (SM-S908B) | `twrp_b0s-eng`
