@@ -1,0 +1,105 @@
+#
+# Copyright (C) 2024 The Android Open Source Project
+# Copyright (C) 2024 The TWRP Open Source Project
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# Architecture
+TARGET_ARCH := arm64
+TARGET_ARCH_VARIANT := armv8-2a-dotprod
+TARGET_CPU_ABI := arm64-v9a
+TARGET_CPU_ABI2 :=
+TARGET_CPU_VARIANT := cortex-a76
+
+# Bootloader
+TARGET_BOOTLOADER_BOARD_NAME := (PRODUCT_PLATFORM)
+TARGET_NO_BOOTLOADER := true
+
+# Platform
+TARGET_BOARD_PLATFORM := $(PRODUCT_PLATFORM)
+
+# Kernel
+BOARD_CUSTOM_BOOTIMG_MK := $(DEVICE_PATH)/mkbootimg.mk
+
+TARGET_KERNEL_ARCH := $(TARGET_ARCH)
+BOARD_KERNEL_IMAGE_NAME := Image
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/$(PRODUCT_DEVICE)/prebuilt/$(BOARD_KERNEL_IMAGE_NAME)
+BOARD_INCLUDE_RECOVERY_DTBO := true
+BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/$(PRODUCT_DEVICE)/prebuilt/dtbo.img
+BOARD_RAMDISK_USE_LZ4 := true
+
+BOARD_KERNEL_CMDLINE := \
+    bootconfig \
+    buildtime_bootconfig=enable \
+    androidboot.hardware=$(PRODUCT_PLATFORM) \
+    androidboot.selinux=permissive \
+    loop.max_part=7
+BOARD_KERNEL_PAGESIZE := 4096
+BOARD_MKBOOTIMG_ARGS := \
+    --dtb $(DEVICE_PATH)/$(PRODUCT_DEVICE)/prebuilt/dtb.img \
+    --ramdisk_offset 0x04000000 \
+    --dtb_offset 0x0A000000 \
+    --os_version 12.0.0 \
+    --tags_offset 0 \
+    --header_version 2
+BOARD_ROOT_EXTRA_FOLDERS := \
+    carrier \
+    efs \
+    optics \
+    prism \
+    spu \
+
+# Android Verified Boot
+BOARD_AVB_ENABLE := true
+BOARD_AVB_RECOVERY_KEY_PATH := external/avb/test/data/testkey_rsa4096.pem
+BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
+
+# Partitions
+BOARD_FLASH_BLOCK_SIZE := 4096
+
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
+
+# Encryption
+BOARD_USES_METADATA_PARTITION := true
+PLATFORM_VERSION := 99.87.36
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
+PLATFORM_SECURITY_PATCH := 2099-12-31
+BOOT_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
+
+# Recovery
+TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
+RECOVERY_SDCARD_ON_DATA := true
+
+# Use mke2fs to create ext4 images
+TARGET_USES_MKE2FS := true
+
+# TWRP specific build flags
+TW_THEME := portrait_hdpi
+TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel/brightness"
+TW_FRAMERATE := 120
+TW_Y_OFFSET := 100
+TW_H_OFFSET := -100
+TW_NO_REBOOT_BOOTLOADER := true
+TW_HAS_DOWNLOAD_MODE := true
+TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
+TW_BACKUP_EXCLUSIONS := /data/fonts/files
+TW_EXTRA_LANGUAGES := true
+TW_EXCLUDE_APEX := true
+TW_NO_EXFAT_FUSE := true
+TW_EXCLUDE_DEFAULT_USB_INIT := true
+TW_ENABLE_FS_COMPRESSION := true
+TW_INCLUDE_NTFS_3G := true
+TW_INCLUDE_RESETPROP := true
+TW_INCLUDE_LIBRESETPROP := true
+TW_INCLUDE_REPACKTOOLS := true
+TW_INCLUDE_LPDUMP := true
+TW_INCLUDE_LPTOOLS := true
+TWRP_INCLUDE_LOGCAT := true
+TARGET_USES_LOGD := true
+TW_NO_HAPTICS := true
