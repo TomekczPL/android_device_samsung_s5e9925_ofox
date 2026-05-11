@@ -24,8 +24,8 @@ Unofficial **OrangeFox R12.0** recovery for the Samsung Galaxy S22 family with E
 | Issue | Status |
 |---|---|
 | `/data` decryption | **Not fixable in custom recovery.** Samsung's FBE + metadata encryption uses keys from Knox Vault / TEE that custom recovery can't access. Userdata appears as raw blocks. Workaround: format data, or use ADB from booted Android for file transfer. |
-| Flashlight | Disabled. S22 routes torch via `/sys/devices/virtual/camera/flash/rear_flash`, which doesn't fit OFRP's `OF_FL_PATH` convention (OFRP appends `/brightness` to the path). Needs a C++ patch to OFRP to support custom suffixes. |
-| Haptic feedback | Not implemented in the device tree (inherited from upstream). |
+| Flashlight | Disabled. S22 routes torch via `/sys/devices/virtual/camera/flash/rear_flash`, which doesn't fit OFRP's `OF_FL_PATH` convention (OFRP appends `/brightness` to the path). |
+| Haptic feedback | Not implemented in the device tree . |
 
 ## 🎨 Baked-in defaults
 
