@@ -2,10 +2,9 @@
 
 Unofficial **OrangeFox R12.0** recovery for the Samsung Galaxy S22 family with Exynos 2200 (SoC codename `s5e9925`).
 
-Forked from [milxnaq/android_device_samsung_s5e9925](https://github.com/milxnaq/android_device_samsung_s5e9925) (TWRP base) with changes that make it usable day-to-day under OrangeFox: per-codename module loading, baked-in defaults, and **persistent settings on `/cache`** (workaround for Samsung's undecryptable `/data`).
 
 | Model | Codename | Lunch target | Tested |
-|---|---|---|---|
+|---|---|---|
 | Galaxy S22 | `r0s` (SM-S901B) | `twrp_r0s-eng`
 | Galaxy S22+ | `g0s` (SM-S906B) | `twrp_g0s-eng`
 | Galaxy S22 Ultra | `b0s` (SM-S908B) | `twrp_b0s-eng`
